@@ -1,0 +1,56 @@
+name: Test CI
+
+on: push
+
+permissions:
+  contents: read
+
+jobs:
+  spam:
+    name: Spam artifacts
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        key-1: [0, 1, 2]
+        key-2: [0, 1, 2, 3, 4]
+        key-3: [0, 1, 2, 3, 4, 5]
+        key-4: [0, 1]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Create output files
+        run: |
+          for i in $(seq 1 1440)
+          do
+            python main.py $i ${{ matrix.key-1 }} ${{ matrix.key-2 }} ${{ matrix.key-3 }} ${{ matrix.key-4 }}
+          done
+
+      - name: Upload output files
+        uses: actions/upload-artifact@v4
+        with:
+          name: output-${{ matrix.key-1 }}-${{ matrix.key-2 }}-${{ matrix.key-3 }}-${{ matrix.key-4 }}
+          path: outputs/*
+
+  summary:
+    name: Summarize results
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    needs: spam
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download results
+        uses: actions/download-artifact@v4
+        with:
+          path: outputs/
+          pattern: output-*
+          merge-multiple: true
