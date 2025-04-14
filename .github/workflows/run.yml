@@ -54,3 +54,9 @@ jobs:
           path: outputs/
           pattern: output-*
           merge-multiple: true
+
+      - name: Upload results
+        uses: Serious-senpai/upload-artifact@debug
+        with:
+          name: summary
+          path: outputs/*
