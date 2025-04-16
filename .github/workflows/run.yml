@@ -55,8 +55,11 @@ jobs:
           pattern: output-*
           merge-multiple: true
 
+      - name: View directory content
+        run: ls -la outputs/
+
       - name: Upload results
-        uses: Serious-senpai/upload-artifact@debug
+        uses: actions/upload-artifact@v4
         with:
           name: summary
           path: outputs/*
